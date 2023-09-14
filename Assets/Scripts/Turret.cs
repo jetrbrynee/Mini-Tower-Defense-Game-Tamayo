@@ -72,19 +72,16 @@ public class Turret : MonoBehaviour
         {
             Debug.Log("Firing at target: " + currentTarget.name);
 
-            // Reset fire cooldown
             fireCooldown = 1 / fireRate;
         }
     }
 
     private GameObject SelectTarget(List<GameObject> enemiesInRange, Transform turretTransform)
     {
-        // Add your target selection logic here
+      
         GameObject currentTarget = null;
 
-        // Implement your custom target selection logic here
-        // For example, prioritize the closest enemy as the current target
-
+  
         float closestDistance = Mathf.Infinity;
 
         foreach (GameObject enemy in enemiesInRange)

@@ -1,48 +1,53 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-    public float moveSpeed = 2.0f;
-    public Transform path;
-    private Transform[] waypoints;
-    private int currentWaypointIndex = 0;
-
+    [Header("References")]
     [SerializeField] private Rigidbody2D rb;
+
+    [Header("Attributes")]
+    [SerializeField] private float moveSpeed = 2f;
+
+    private Transform target;
+    private int pathIndex = 0;
+
     private void Start()
     {
-        waypoints = new Transform[path.childCount];
-        for (int i = 0; i < path.childCount; i++)
-        {
-            waypoints[i] = path.GetChild(i);
-        }
+        target = LevelManager.main.path[pathIndex];
     }
 
     private void Update()
     {
-        if (currentWaypointIndex < waypoints.Length)
+        if (Vector2.Distance(target.position, transform.position) <= 0.1f)
         {
-            Vector2 targetPosition = waypoints[currentWaypointIndex].position;
-            Vector2 moveDirection = (targetPosition - (Vector2)transform.position).normalized;
+            pathIndex++;
 
-            if (rb != null)
+            if (pathIndex == LevelManager.main.path.Length)
             {
-                rb.velocity = moveDirection * moveSpeed;
+                // Deduct 1 health from the player when the enemy reaches the last vector
+                PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(1);
+                }
+
+                // Notify the EnemySpawner that an enemy has been destroyed
+                EnemySpawner.onEnemyDestroy.Invoke();
+                Destroy(gameObject);
             }
-
-            if (Vector2.Distance(transform.position, targetPosition) < 0.1f)
+            else
             {
-                currentWaypointIndex++;
+                target = LevelManager.main.path[pathIndex];
             }
         }
-        else
-        {
-            PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(1);
-            }
+    }
 
-            Destroy(gameObject);
-        }
+    private void FixedUpdate()
+    {
+        Vector2 direction = (target.position - transform.position).normalized;
+
+        rb.velocity = direction * moveSpeed;
     }
 }

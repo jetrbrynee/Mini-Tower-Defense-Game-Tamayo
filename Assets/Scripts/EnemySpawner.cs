@@ -1,4 +1,7 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -15,6 +18,9 @@ public class EnemySpawner : MonoBehaviour
     private int enemiesAlive;
     private int enemiesLeftToSpawn;
     private bool isSpawning = false;
+
+    // Add the onEnemyDestroy event here
+    public static UnityEvent onEnemyDestroy = new UnityEvent();
 
     private void Start()
     {
@@ -53,11 +59,11 @@ public class EnemySpawner : MonoBehaviour
         {
             int randomIndex = Random.Range(0, enemyPrefabs.Length);
             GameObject enemyPrefab = enemyPrefabs[randomIndex];
-            Instantiate(enemyPrefab, transform.position, Quaternion.identity);
+            Instantiate(enemyPrefab, LevelManager.main.startPoint.position, Quaternion.identity);
             enemiesLeftToSpawn--;
             enemiesAlive++;
 
-            Debug.Log("Spawn Enemy");
+            // Debug.Log("Spawn Enemy");
         }
 
         if (enemiesLeftToSpawn == 0 && enemiesAlive == 0)

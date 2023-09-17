@@ -26,14 +26,11 @@ public class EnemyMovement : MonoBehaviour
 
             if (pathIndex == LevelManager.main.path.Length)
             {
-                // Deduct 1 health from the player when the enemy reaches the last vector
                 PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(1);
                 }
-
-                // Notify the EnemySpawner that an enemy has been destroyed
                 EnemySpawner.onEnemyDestroy.Invoke();
                 Destroy(gameObject);
             }

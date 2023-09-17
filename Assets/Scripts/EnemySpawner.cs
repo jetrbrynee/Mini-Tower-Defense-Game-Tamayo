@@ -1,17 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private GameObject[] enemyPrefabs;
 
     [Header("Attributes")]
     [SerializeField] private int baseEnemies = 8;
     [SerializeField] private float enemiesPerSecond = 0.5f;
     [SerializeField] private float timeBetweenWaves = 5f;
-    [SerializeField] private float difficultyScalingFactor = 0.75f;
 
     private int currentWave = 1;
     private float timeSinceLastSpawn;
@@ -26,14 +23,16 @@ public class EnemySpawner : MonoBehaviour
 
     private void Update()
     {
-        if (!isSpawning) return;
+        timeSinceLastSpawn = 0f;
+
+        if (!isSpawning)
+            return;
 
         timeSinceLastSpawn += Time.deltaTime;
 
         if (timeSinceLastSpawn >= (1f / enemiesPerSecond) && enemiesLeftToSpawn > 0)
         {
             SpawnEnemy();
-            timeSinceLastSpawn = 0f;
         }
     }
 
@@ -45,16 +44,20 @@ public class EnemySpawner : MonoBehaviour
 
     private int EnemiesPerWave()
     {
-        return Mathf.RoundToInt(baseEnemies * Mathf.Pow(currentWave, difficultyScalingFactor));
+        return Mathf.RoundToInt(baseEnemies * Mathf.Pow(currentWave, 0.5f));
     }
 
     private void SpawnEnemy()
     {
-        if (enemyPrefab != null && enemiesLeftToSpawn > 0)
+        if (enemiesLeftToSpawn > 0)
         {
+            int randomIndex = Random.Range(0, enemyPrefabs.Length);
+            GameObject enemyPrefab = enemyPrefabs[randomIndex];
             Instantiate(enemyPrefab, transform.position, Quaternion.identity);
             enemiesLeftToSpawn--;
             enemiesAlive++;
+
+            Debug.Log("Spawn Enemy");
         }
 
         if (enemiesLeftToSpawn == 0 && enemiesAlive == 0)
@@ -62,6 +65,14 @@ public class EnemySpawner : MonoBehaviour
             currentWave++;
             isSpawning = false;
             Invoke("StartWave", timeBetweenWaves);
+        }
+    }
+
+    public void StartSpawning()
+    {
+        if (!isSpawning)
+        {
+            StartWave();
         }
     }
 }

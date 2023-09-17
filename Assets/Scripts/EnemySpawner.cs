@@ -19,7 +19,7 @@ public class EnemySpawner : MonoBehaviour
     private int enemiesLeftToSpawn;
     private bool isSpawning = false;
 
-    // Add the onEnemyDestroy event here
+    
     public static UnityEvent onEnemyDestroy = new UnityEvent();
 
     private void Start()
@@ -62,8 +62,6 @@ public class EnemySpawner : MonoBehaviour
             Instantiate(enemyPrefab, LevelManager.main.startPoint.position, Quaternion.identity);
             enemiesLeftToSpawn--;
             enemiesAlive++;
-
-            // Debug.Log("Spawn Enemy");
         }
 
         if (enemiesLeftToSpawn == 0 && enemiesAlive == 0)

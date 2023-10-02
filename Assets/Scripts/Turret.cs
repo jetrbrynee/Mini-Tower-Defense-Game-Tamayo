@@ -11,6 +11,14 @@ public class Turret : MonoBehaviour
     private GameObject currentTarget;
     private float fireCooldown;
 
+    private Transform turretRotationPoint;
+
+    private void Start()
+    {
+        // Assuming you have a child object named "RotatePoint" for turret rotation.
+        turretRotationPoint = transform.Find("RotatePoint");
+    }
+
     private void Update()
     {
         UpdateEnemiesInRange();
@@ -26,40 +34,27 @@ public class Turret : MonoBehaviour
 
         foreach (GameObject enemy in enemies)
         {
-            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            float distance = Vector3.Distance(turretRotationPoint.position, enemy.transform.position);
 
             if (distance <= range)
             {
                 enemiesInRange.Add(enemy);
             }
         }
-
-        Debug.Log("Number of enemies in range: " + enemiesInRange.Count);
     }
 
     private void ChooseTarget()
     {
-        currentTarget = SelectTarget(enemiesInRange, transform);
-
-        if (currentTarget != null)
-        {
-            Debug.Log("Current target: " + currentTarget.name);
-        }
-        else
-        {
-            Debug.Log("No enemies in range.");
-        }
+        currentTarget = SelectTarget(enemiesInRange, turretRotationPoint);
     }
 
     private void AimAtTarget()
     {
         if (currentTarget == null) return;
 
-        Vector3 targetDirection = currentTarget.transform.position - transform.position;
+        Vector3 targetDirection = currentTarget.transform.position - turretRotationPoint.position;
         Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, turnRate * Time.deltaTime);
-
-        Debug.Log("Aiming at target: " + currentTarget.name);
+        turretRotationPoint.rotation = Quaternion.Slerp(turretRotationPoint.rotation, targetRotation, turnRate * Time.deltaTime);
     }
 
     private void Fire()
@@ -70,18 +65,17 @@ public class Turret : MonoBehaviour
 
         if (fireCooldown <= 0)
         {
-            Debug.Log("Firing at target: " + currentTarget.name);
+            // Perform your firing logic here.
+            // For example, instantiate and fire a projectile at the currentTarget.
 
+            // Reset the cooldown.
             fireCooldown = 1 / fireRate;
         }
     }
 
     private GameObject SelectTarget(List<GameObject> enemiesInRange, Transform turretTransform)
     {
-      
         GameObject currentTarget = null;
-
-  
         float closestDistance = Mathf.Infinity;
 
         foreach (GameObject enemy in enemiesInRange)
